@@ -18,6 +18,9 @@ model Cirugia {
   id          Int      @id @default(autoincrement())
   pacienteId  Int
   quirofanoId Int
+  servicioId  Int
+  tipo        String
+  anestesia   String
   fecha       DateTime
   estado      String
   prioridad   String
@@ -25,5 +28,4 @@ model Cirugia {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 

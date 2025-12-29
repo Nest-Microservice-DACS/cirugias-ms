@@ -6,7 +6,7 @@ export class CreateCirugiaDto {
     @Type(() => Number)
     pacienteId: number;
 
-    @IsDateString() // valida que sea un string ISO 8601
+    @IsDateString() // valida que sea un string ISO 8601  Ejemplo: "2024-06-15T13:45:30Z"
     fecha: string;
 
     @IsNumber() 
@@ -25,4 +25,7 @@ export class CreateCirugiaDto {
 
     @IsString()
     estado: string;
+
+    @IsString()
+    prioridad: string;
 }

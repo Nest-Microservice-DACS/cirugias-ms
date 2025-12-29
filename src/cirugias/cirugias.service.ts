@@ -3,6 +3,8 @@ import { CreateCirugiaDto } from './dto/create-cirugia.dto';
 import { UpdateCirugiaDto } from './dto/update-cirugia.dto';
 import { PrismaClient } from '../../generated/prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PaginationDto } from 'src/common';
+import { skip } from '@prisma/client/runtime/client';
 
 @Injectable()
 export class CirugiasService extends PrismaClient implements OnModuleInit {
@@ -21,11 +23,26 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
   }
 
   create(createCirugiaDto: CreateCirugiaDto) {
-    return 'This action adds a new cirugia';
+    return this.cirugia.create({ data: createCirugiaDto });
   }
 
-  findAll() {
-    return `This action returns all cirugias`;
+  async findAll(paginationDto: PaginationDto) {
+    const { size = 10, page = 1 } = paginationDto;
+
+    const totalPages = await this.cirugia.count();
+    const lastPage = Math.ceil(totalPages / size);
+
+    return {
+      data: await this.cirugia.findMany({
+        take: size,
+        skip: (page - 1) * size,
+      }),
+      meta: {
+        size,
+        page,
+        lastPage,
+      },
+    };
   }
 
   findOne(id: number) {
