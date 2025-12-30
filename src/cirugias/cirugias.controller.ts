@@ -20,7 +20,7 @@ export class CirugiasController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.cirugiasService.findOne(+id);
+    return this.cirugiasService.findById(+id);
   }
 
   @Patch(':id')

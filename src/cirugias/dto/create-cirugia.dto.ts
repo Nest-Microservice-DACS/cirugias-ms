@@ -23,8 +23,6 @@ export class CreateCirugiaDto {
     @IsString()
     tipo: string;
 
-    @IsString()
-    estado: string;
 
     @IsString()
     prioridad: string;

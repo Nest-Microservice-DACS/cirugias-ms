@@ -1,10 +1,16 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { CreateCirugiaDto } from './dto/create-cirugia.dto';
 import { UpdateCirugiaDto } from './dto/update-cirugia.dto';
 import { PrismaClient } from '../../generated/prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PaginationDto } from 'src/common';
 import { skip } from '@prisma/client/runtime/client';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class CirugiasService extends PrismaClient implements OnModuleInit {
@@ -36,6 +42,7 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
       data: await this.cirugia.findMany({
         take: size,
         skip: (page - 1) * size,
+        where: { estado: { not: 'cancelada' } },
       }),
       meta: {
         size,
@@ -45,15 +52,41 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cirugia`;
+  async findById(id: number) {
+    const cirugia = await this.cirugia.findFirst({ where: { id, estado: { not: 'cancelada' } } });
+
+    if (!cirugia) {
+      throw new NotFoundException(`Cirugia with ID #${id} not found`);
+    }
+    return cirugia;
   }
 
-  update(id: number, updateCirugiaDto: UpdateCirugiaDto) {
-    return `This action updates a #${id} cirugia`;
+  async update(id: number, updateCirugiaDto: UpdateCirugiaDto) {
+    try {
+      return await this.cirugia.update({
+        where: { id, estado: { not: 'cancelada' } },
+        data: updateCirugiaDto,
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        // Prisma error: record not found
+        throw new NotFoundException(`Cirugía con id ${id} no encontrada`);
+      }
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cirugia`;
+  async remove(id: number) {
+    try {
+      return await this.cirugia.update({
+        where: { id },
+        data: { estado: 'cancelada' },
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException(`Cirugía con id ${id} no encontrada`);
+      }
+      throw error;
+    }
   }
 }

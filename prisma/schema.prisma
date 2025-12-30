@@ -22,10 +22,12 @@ model Cirugia {
   tipo        String
   anestesia   String
   fecha       DateTime
-  estado      String
+  estado      String? @default("programada")
   prioridad   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([estado])
 }
 
