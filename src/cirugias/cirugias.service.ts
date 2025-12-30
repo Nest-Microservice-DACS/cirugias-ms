@@ -53,7 +53,9 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
   }
 
   async findById(id: number) {
-    const cirugia = await this.cirugia.findFirst({ where: { id, estado: { not: 'cancelada' } } });
+    const cirugia = await this.cirugia.findFirst({
+      where: { id, estado: { not: 'cancelada' } },
+    });
 
     if (!cirugia) {
       throw new NotFoundException(`Cirugia with ID #${id} not found`);
@@ -63,9 +65,10 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
 
   async update(id: number, updateCirugiaDto: UpdateCirugiaDto) {
     try {
+      const { id: _, ...data } = updateCirugiaDto; // Exclude id from update data
       return await this.cirugia.update({
         where: { id, estado: { not: 'cancelada' } },
-        data: updateCirugiaDto,
+        data: data,
       });
     } catch (error) {
       if (error.code === 'P2025') {
