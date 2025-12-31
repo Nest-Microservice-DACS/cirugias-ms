@@ -76,11 +76,10 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
         data: data,
       });
     } catch (error) {
-      if (error.code === 'P2025') {
-        // Prisma error: record not found
-        throw new NotFoundException(`Cirugía con id ${id} no encontrada`);
-      }
-      throw error;
+      throw new RpcException({
+        message: `Cirugia with ID #${id} not found`,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
   }
 
@@ -91,10 +90,10 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
         data: { estado: 'cancelada' },
       });
     } catch (error) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`Cirugía con id ${id} no encontrada`);
-      }
-      throw error;
+      throw new RpcException({
+        message: `Cirugia with ID #${id} not found`,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
   }
 }
