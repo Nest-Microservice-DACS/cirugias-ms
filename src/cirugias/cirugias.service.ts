@@ -1,4 +1,5 @@
 import {
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -11,6 +12,7 @@ import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PaginationDto } from 'src/common';
 import { skip } from '@prisma/client/runtime/client';
 import { NotFoundError } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class CirugiasService extends PrismaClient implements OnModuleInit {
@@ -58,7 +60,10 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
     });
 
     if (!cirugia) {
-      throw new NotFoundException(`Cirugia with ID #${id} not found`);
+      throw new RpcException({
+        message: `Cirugia with ID #${id} not found`,
+        status: HttpStatus.BAD_REQUEST,
+      });
     }
     return cirugia;
   }

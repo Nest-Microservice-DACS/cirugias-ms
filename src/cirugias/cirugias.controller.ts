@@ -19,7 +19,7 @@ export class CirugiasController {
     return this.cirugiasService.findAll(paginationDto);
   }
 
-  @MessagePattern({ cmd: 'get_cirugia' })
+  @MessagePattern({ cmd: 'get_cirugia_by_id' })
   findOne(@Payload('id') id: string) {
     return this.cirugiasService.findById(+id);
   }
