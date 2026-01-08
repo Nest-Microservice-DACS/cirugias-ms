@@ -6,7 +6,7 @@ import { Logger } from '@nestjs/common/services/logger.service';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const logger = new Logger('Main');
+  const logger = new Logger('CirugiasMS-Main');
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
