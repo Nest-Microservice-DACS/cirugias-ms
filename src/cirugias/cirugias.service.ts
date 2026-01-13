@@ -30,7 +30,7 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
     this.logger.log('Database connected');
   }
 
-  create(createCirugiaDto: CreateCirugiaDto) {
+  async create(createCirugiaDto: CreateCirugiaDto) {
     return this.cirugia.create({ data: createCirugiaDto });
   }
 

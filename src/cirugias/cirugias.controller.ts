@@ -10,27 +10,27 @@ export class CirugiasController {
   constructor(private readonly cirugiasService: CirugiasService) {}
 
   @MessagePattern({ cmd: 'create_cirugia' })
-  create(@Payload() createCirugiaDto: CreateCirugiaDto) {
+  async create(@Payload() createCirugiaDto: CreateCirugiaDto) {
     return this.cirugiasService.create(createCirugiaDto);
   }
 
   @MessagePattern({ cmd: 'get_cirugias' })
-  findAll(@Payload() paginationDto: PaginationDto) {
+  async findAll(@Payload() paginationDto: PaginationDto) {
     return this.cirugiasService.findAll(paginationDto);
   }
 
   @MessagePattern({ cmd: 'get_cirugia_by_id' })
-  findOne(@Payload('id') id: string) {
+  async findOne(@Payload('id') id: string) {
     return this.cirugiasService.findById(+id);
   }
 
   @MessagePattern({ cmd: 'update_cirugia' })
-  update(@Payload() updateCirugiaDto: UpdateCirugiaDto) {
+  async update(@Payload() updateCirugiaDto: UpdateCirugiaDto) {
     return this.cirugiasService.update(updateCirugiaDto.id, updateCirugiaDto);
   }
 
   @MessagePattern({ cmd: 'delete_cirugia' })
-  remove(@Payload() id: string) {
+  async remove(@Payload() id: string) {
     return this.cirugiasService.remove(+id);
   }
 }
