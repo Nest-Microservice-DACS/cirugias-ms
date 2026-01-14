@@ -11,6 +11,4 @@ export class PaginationDto {
   @IsPositive()
   @Type(() => Number)
   size?: number = 10;
-
-  
 }

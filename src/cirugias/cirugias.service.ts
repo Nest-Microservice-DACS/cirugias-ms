@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
 import { CreateCirugiaDto } from './dto/create-cirugia.dto';
@@ -13,14 +14,25 @@ import { PaginationDto } from 'src/common';
 import { skip } from '@prisma/client/runtime/client';
 import { NotFoundError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
 @Injectable()
-export class CirugiasService extends PrismaClient implements OnModuleInit {
+export class CirugiasService 
+   extends PrismaClient
+  implements OnModuleInit
+{
+  private pool: Pool;
+  private adapter: PrismaPg;
+
   constructor() {
-    const adapter = new PrismaBetterSqlite3({
-      url: process.env.DATABASE_URL,
+    const pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
     });
+    const adapter = new PrismaPg(pool);
     super({ adapter });
+    this.pool = pool;
+    this.adapter = adapter;
   }
 
   private readonly logger = new Logger('CirugiasService');
@@ -31,7 +43,20 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
   }
 
   async create(createCirugiaDto: CreateCirugiaDto) {
-    return this.cirugia.create({ data: createCirugiaDto });
+    const { cirugiaMedicos, ...rest } = createCirugiaDto;
+    let data: any = { ...rest };
+    if (cirugiaMedicos && cirugiaMedicos.length > 0) {
+      data.cirugiaMedicos = {
+        create: cirugiaMedicos.map((cm) => ({
+          medicoId: cm.medicoId,
+          rol: cm.rol,
+        })),
+      };
+    }
+    return this.cirugia.create({
+      data,
+      include: { cirugiaMedicos: true },
+    });
   }
 
   async findAll(paginationDto: PaginationDto) {
@@ -45,6 +70,7 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
         take: size,
         skip: (page - 1) * size,
         where: { estado: { not: 'cancelada' } },
+        include: { cirugiaMedicos: true },
       }),
       meta: {
         size,
@@ -55,8 +81,9 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
   }
 
   async findById(id: number) {
-    const cirugia = await this.cirugia.findFirst({
-      where: { id, estado: { not: 'cancelada' } },
+    const cirugia = await this.cirugia.findUnique({
+      where: { id: id },
+      include: { cirugiaMedicos: true },
     });
 
     if (!cirugia) {
@@ -70,10 +97,21 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
 
   async update(id: number, updateCirugiaDto: UpdateCirugiaDto) {
     try {
-      const { id: _, ...data } = updateCirugiaDto; // Exclude id from update data
+      const { id: _, cirugiaMedicos, ...rest } = updateCirugiaDto; // Exclude id from update data
+      let data: any = { ...rest };
+      if (cirugiaMedicos && cirugiaMedicos.length > 0) {
+        data.cirugiaMedicos = {
+          set: [], // Remove existing
+          create: cirugiaMedicos.map((cm) => ({
+            medicoId: cm.medicoId,
+            rol: cm.rol,
+          })),
+        };
+      }
       return await this.cirugia.update({
         where: { id, estado: { not: 'cancelada' } },
-        data: data,
+        data,
+        include: { cirugiaMedicos: true },
       });
     } catch (error) {
       throw new RpcException({
@@ -88,6 +126,7 @@ export class CirugiasService extends PrismaClient implements OnModuleInit {
       return await this.cirugia.update({
         where: { id },
         data: { estado: 'cancelada' },
+        include: { cirugiaMedicos: true },
       });
     } catch (error) {
       throw new RpcException({

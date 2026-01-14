@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, ParseIntPipe } from '@nestjs/common';
 import { CirugiasService } from './cirugias.service';
 import { CreateCirugiaDto } from './dto/create-cirugia.dto';
 import { UpdateCirugiaDto } from './dto/update-cirugia.dto';
@@ -20,8 +20,8 @@ export class CirugiasController {
   }
 
   @MessagePattern({ cmd: 'get_cirugia_by_id' })
-  async findOne(@Payload('id') id: string) {
-    return this.cirugiasService.findById(+id);
+  async findOne(@Payload('id') id: number) {
+    return this.cirugiasService.findById(id);
   }
 
   @MessagePattern({ cmd: 'update_cirugia' })
@@ -30,7 +30,7 @@ export class CirugiasController {
   }
 
   @MessagePattern({ cmd: 'delete_cirugia' })
-  async remove(@Payload() id: string) {
-    return this.cirugiasService.remove(+id);
+  async remove(@Payload() id : number) {
+    return this.cirugiasService.remove(id);
   }
 }

@@ -11,7 +11,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model Cirugia {
@@ -22,12 +22,25 @@ model Cirugia {
   tipo        String
   anestesia   String
   fecha       DateTime
-  estado      String? @default("programada")
+  estado      String @default("programada")
   prioridad   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  cirugiaMedicos CirugiaMedico[] // Opposite relation field
+
   @@index([estado])
 }
 
+// Representa la relación entre una cirugía y un médico con su rol específico
+model CirugiaMedico {
+  id        Int    @id @default(autoincrement())
+  cirugiaId Int
+  medicoId  Int
+  rol       String // CIRUJANO, AYUDANTE, ANESTESISTA, ...
+
+  cirugia Cirugia @relation(fields: [cirugiaId], references: [id])
+
+  @@unique([cirugiaId, medicoId, rol])
+}
