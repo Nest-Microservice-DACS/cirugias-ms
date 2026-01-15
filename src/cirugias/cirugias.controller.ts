@@ -1,63 +1,57 @@
 import { Controller, ParseIntPipe } from '@nestjs/common';
-import { CirugiasService } from './cirugias.service';
-import { CreateCirugiaDto } from './dto/create-cirugia.dto';
-import { UpdateCirugiaDto } from './dto/update-cirugia.dto';
 import { PaginationDto } from 'src/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import {
-  AddMedicosCirugiaDto,
-  MedicoCirugiaDto,
-  RemoveMedicosCirugiaDto,
-} from './dto';
+import { CreateSurgeryDto, DoctorSurgeryDto, RemoveDoctorsSurgeryDto, UpdateSurgeryDto } from './dto';
+import { SurgeriesService } from './surgery.service';
 
-@Controller('cirugias')
+@Controller('surgery')
 export class CirugiasController {
-  constructor(private readonly cirugiasService: CirugiasService) {}
+  constructor(private readonly surgeriesService: SurgeriesService) {}
 
-  @MessagePattern({ cmd: 'create_cirugia' })
-  async create(@Payload() createCirugiaDto: CreateCirugiaDto) {
-    return this.cirugiasService.create(createCirugiaDto);
+  @MessagePattern({ cmd: 'create_surgery' })
+  async create(@Payload() createSurgeryDto: CreateSurgeryDto) {
+    return this.surgeriesService.create(createSurgeryDto);
   }
 
-  @MessagePattern({ cmd: 'get_cirugias' })
+  @MessagePattern({ cmd: 'get_surgeries' })
   async findAll(@Payload() paginationDto: PaginationDto) {
-    return this.cirugiasService.findAll(paginationDto);
+    return this.surgeriesService.findAll(paginationDto);
   }
 
-  @MessagePattern({ cmd: 'get_cirugia_by_id' })
+  @MessagePattern({ cmd: 'get_surgery_by_id' })
   async findOne(@Payload('id') id: number) {
-    return this.cirugiasService.findById(id);
+    return this.surgeriesService.findById(id);
   }
 
-  @MessagePattern({ cmd: 'update_cirugia' })
-  async update(@Payload() updateCirugiaDto: UpdateCirugiaDto) {
-    return this.cirugiasService.update(updateCirugiaDto.id, updateCirugiaDto);
+  @MessagePattern({ cmd: 'update_surgery' })
+  async update(@Payload() updateSurgeryDto: UpdateSurgeryDto) {
+    return this.surgeriesService.update(updateSurgeryDto.id, updateSurgeryDto);
   }
 
-  @MessagePattern({ cmd: 'delete_cirugia' })
+  @MessagePattern({ cmd: 'delete_surgery' })
   async remove(@Payload() id: number) {
-    return this.cirugiasService.remove(id);
+    return this.surgeriesService.remove(id);
   }
 
-  @MessagePattern({ cmd: 'add_medicos_to_cirugia' })
-  async addMedicosToCirugia(
+  @MessagePattern({ cmd: 'add_doctors_to_surgery' })
+  async addDoctorsToSurgery(
     @Payload()
-    { cirugiaId, medicos }: { cirugiaId: number; medicos: MedicoCirugiaDto[] },
+    { surgeryId, doctors }: { surgeryId: number; doctors: DoctorSurgeryDto[] },
   ) {
-    return this.cirugiasService.addMedicosToCirugia({ medicos }, cirugiaId);
+    return this.surgeriesService.addDoctorsToSurgery({ doctors }, surgeryId);
   }
 
-  @MessagePattern({ cmd: 'remove_medicos_from_cirugia' })
-  async removeMedicosFromCirugia(
+  @MessagePattern({ cmd: 'remove_doctors_from_surgery' })
+  async removeDoctorsFromSurgery(
     @Payload()
     {
-      cirugiaId,
-      medicoIds,
+      surgeryId,
+      doctorIds,
     }: {
-      cirugiaId: number;
-      medicoIds: RemoveMedicosCirugiaDto;
+      surgeryId: number;
+      doctorIds: RemoveDoctorsSurgeryDto;
     },
   ) {
-    return this.cirugiasService.removeMedicosFromCirugia(medicoIds, cirugiaId);
+    return this.surgeriesService.removeDoctorsFromSurgery(doctorIds, surgeryId);
   }
 }

@@ -14,33 +14,32 @@ datasource db {
   provider = "postgresql"
 }
 
-model Cirugia {
+model Surgery {
   id          Int      @id @default(autoincrement())
-  pacienteId  Int
-  quirofanoId Int
-  servicioId  Int
-  tipo        String
-  anestesia   String
-  fecha       DateTime
-  estado      String @default("programada")
-  prioridad   String
+  patientId  Int
+  operatingRoomId Int
+  serviceId  Int
+  type        String
+  anesthesia   String
+  date       DateTime
+  status      String @default("scheduled")
+  priority   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cirugiaMedicos CirugiaMedico[] // Opposite relation field
+  surgeryDoctors SurgeryDoctor[] // Opposite relation field
 
-  @@index([estado])
+  @@index([status])
 }
 
 // Representa la relación entre una cirugía y un médico con su rol específico
-model CirugiaMedico {
+model SurgeryDoctor {
   id        Int    @id @default(autoincrement())
-  cirugiaId Int
-  medicoId  Int
-  rol       String // CIRUJANO, AYUDANTE, ANESTESISTA, ...
+  surgeryId Int
+  doctorId  Int
+  role       String // CIRUJANO, AYUDANTE, ANESTESISTA, ...
+  surgery Surgery @relation(fields: [surgeryId], references: [id])
 
-  cirugia Cirugia @relation(fields: [cirugiaId], references: [id])
-
-  @@unique([cirugiaId, medicoId, rol])
+  @@unique([surgeryId, doctorId, role])
 }

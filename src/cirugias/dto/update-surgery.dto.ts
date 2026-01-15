@@ -1,8 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateCirugiaDto } from './create-cirugia.dto';
 import { IsNumber, IsPositive, IsString } from 'class-validator';
+import { CreateSurgeryDto } from './create-surgery.dto';
 
-export class UpdateCirugiaDto extends PartialType(CreateCirugiaDto) {
+export class UpdateSurgeryDto extends PartialType(CreateSurgeryDto) {
   @IsNumber()
   @IsPositive()
   id: number;

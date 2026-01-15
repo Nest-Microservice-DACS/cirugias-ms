@@ -2,50 +2,52 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsDateString,
+  IsEnum,
   isNumber,
   IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { PersonalRole } from '../enum/surgery.enum';
 
-export class CreateCirugiaDto {
+export class CreateSurgeryDto {
   @IsNumber()
   @Type(() => Number)
-  pacienteId: number;
+  patientId: number;
 
   @IsDateString() // valida que sea un string ISO 8601  Ejemplo: "2024-06-15T13:45:30Z"
-  fecha: string;
+  date: string;
 
   @IsNumber()
   @Type(() => Number)
-  servicioId: number;
+  serviceId: number;
 
   @IsNumber()
   @Type(() => Number)
-  quirofanoId: number;
+  operatingRoomId: number;
 
   @IsString()
-  anestesia: string;
+  anesthesia: string;
 
   @IsString()
-  tipo: string;
+  type: string;
 
   @IsString()
-  prioridad: string;
+  priority: string;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CirugiaMedicosDto)
-  cirugiaMedicos: CirugiaMedicosDto[];
+  @Type(() => SurgeryDoctorsDto)
+  surgeryDoctors: SurgeryDoctorsDto[];
 }
 
-export class CirugiaMedicosDto {
+export class SurgeryDoctorsDto {
   @IsNumber()
   @Type(() => Number)
-  medicoId: number;
+  doctorId: number;
 
-  @IsString()
-  rol: string; // CIRUJANO, AYUDANTE, ANESTESISTA, ...   implementar una clase Enum
+  @IsEnum(PersonalRole)
+  role: PersonalRole; // SURGEON, ASSISTANT, ANESTHETIST, ...   implementar una clase Enum
 }
