@@ -1,6 +1,6 @@
 ## Microservicio de Gestión de Cirugías
 
-Este módulo es un microservicio desarrollado con NestJS que utiliza comunicación TCP para la gestión de las cirugías del hospital, permitiendo operaciones como alta, consulta, actualización y baja de cirugías.
+Este módulo es un microservicio desarrollado con NestJS que utiliza comunicación TCP para la gestión de las cirugías del hospital.
 
 ### Tabla de Contenidos
 
@@ -24,7 +24,7 @@ Proyecto en **fase de desarrollo** - Funcionalidades core implementadas. Mejoras
 
 ## Descripción
 
-Este microservicio administra y expone operaciones para la gestión de las cirugías del hospital mediante comunicación TCP, permitiendo su integración con otros módulos del sistema y facilitando el acceso seguro a la información de las cirugías.
+Este microservicio administra y expone operaciones para la gestión de las cirugías del hospital mediante comunicación TCP, permitiendo su integración con otros módulos del sistema y facilitando el acceso seguro a la información de las cirugías. Además, permite la asignación de médicos a las cirugías, asegurando una gestión eficiente y coordinada del personal médico involucrado en cada procedimiento.
 
 ## Diagrama de clases simplificado
 
@@ -95,6 +95,8 @@ Este microservicio responde a mensajes TCP con los siguientes patrones principal
 - `createSurgery`: Crea una nueva cirugía
 - `updateSurgery`: Actualiza una cirugía existente
 - `deleteSurgery`: Elimina una cirugía
+- `addDoctorsToSurgery`: Asigna médicos a una cirugía
+- `removeDoctorsFromSurgery`: Remueve médicos de una cirugía
 
 Consulta el código fuente para ver los payloads y DTOs utilizados en cada patrón.
 
