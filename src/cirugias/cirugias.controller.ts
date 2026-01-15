@@ -4,6 +4,11 @@ import { CreateCirugiaDto } from './dto/create-cirugia.dto';
 import { UpdateCirugiaDto } from './dto/update-cirugia.dto';
 import { PaginationDto } from 'src/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  AddMedicosCirugiaDto,
+  MedicoCirugiaDto,
+  RemoveMedicosCirugiaDto,
+} from './dto';
 
 @Controller('cirugias')
 export class CirugiasController {
@@ -30,7 +35,29 @@ export class CirugiasController {
   }
 
   @MessagePattern({ cmd: 'delete_cirugia' })
-  async remove(@Payload() id : number) {
+  async remove(@Payload() id: number) {
     return this.cirugiasService.remove(id);
+  }
+
+  @MessagePattern({ cmd: 'add_medicos_to_cirugia' })
+  async addMedicosToCirugia(
+    @Payload()
+    { cirugiaId, medicos }: { cirugiaId: number; medicos: MedicoCirugiaDto[] },
+  ) {
+    return this.cirugiasService.addMedicosToCirugia({ medicos }, cirugiaId);
+  }
+
+  @MessagePattern({ cmd: 'remove_medicos_from_cirugia' })
+  async removeMedicosFromCirugia(
+    @Payload()
+    {
+      cirugiaId,
+      medicoIds,
+    }: {
+      cirugiaId: number;
+      medicoIds: RemoveMedicosCirugiaDto;
+    },
+  ) {
+    return this.cirugiasService.removeMedicosFromCirugia(medicoIds, cirugiaId);
   }
 }

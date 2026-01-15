@@ -16,12 +16,10 @@ import { NotFoundError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { AddMedicosCirugiaDto, RemoveMedicosCirugiaDto } from './dto';
 
 @Injectable()
-export class CirugiasService 
-   extends PrismaClient
-  implements OnModuleInit
-{
+export class CirugiasService extends PrismaClient implements OnModuleInit {
   private pool: Pool;
   private adapter: PrismaPg;
 
@@ -132,6 +130,62 @@ export class CirugiasService
       throw new RpcException({
         message: `Cirugia with ID #${id} not found`,
         status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  async addMedicosToCirugia(addMedicosCirugiaDto: AddMedicosCirugiaDto, cirugiaId: number) {
+    try {
+      const createData = addMedicosCirugiaDto.medicos.map((mc) => ({
+        cirugiaId: cirugiaId,
+        medicoId: mc.medicoId,
+        rol: mc.rol,
+      }));
+      // Crear los registros
+      await this.cirugiaMedico.createMany({
+        data: createData,
+        skipDuplicates: true,
+      });
+      // Devolver los registros creados
+      const created = await this.cirugiaMedico.findMany({
+        where: {
+          cirugiaId: cirugiaId,
+          medicoId: { in: addMedicosCirugiaDto.medicos.map((mc) => mc.medicoId) },
+        },
+      });
+      return { created };
+    } catch (error) {
+      this.logger.error('Error adding medicos to cirugia', error);
+      throw new RpcException({
+        message: `Error adding medicos to cirugia: ${error.message}`,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+      });
+    }
+  }
+  
+  async removeMedicosFromCirugia(removeMedicosCirugiaDto: RemoveMedicosCirugiaDto, cirugiaId: number) {
+    try {
+      const { medicoIds } = removeMedicosCirugiaDto;
+      // Buscar los registros a eliminar
+      const toDelete = await this.cirugiaMedico.findMany({
+        where: {
+          cirugiaId: cirugiaId,
+          medicoId: { in: medicoIds },
+        },
+      });
+      // Eliminar los registros
+      await this.cirugiaMedico.deleteMany({
+        where: {
+          cirugiaId: cirugiaId,
+          medicoId: { in: medicoIds },
+        },
+      });
+      return { deleted: toDelete };
+    } catch (error) {
+      this.logger.error('Error removing medicos from cirugia', error);
+      throw new RpcException({
+        message: `Error removing medicos from cirugia: ${error.message}`,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
   }
