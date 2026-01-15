@@ -1,4 +1,4 @@
-## Microservicio de Gestión de Cirugias
+## Microservicio de Gestión de Cirugías
 
 Este módulo es un microservicio desarrollado con NestJS que utiliza comunicación TCP para la gestión de las cirugías del hospital, permitiendo operaciones como alta, consulta, actualización y baja de cirugías.
 
